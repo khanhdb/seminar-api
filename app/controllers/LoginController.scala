@@ -1,16 +1,19 @@
 package controllers
 
-import javax.inject._
+import javax.inject.Inject
+import play.api.libs.json.Json
 import play.api.mvc._
-import services.Counter
+
+import scala.concurrent.ExecutionContext
 
 
-@Singleton
-class LoginController @Inject()(cc: ControllerComponents,
-                                counter: Counter) extends AbstractController(cc) {
+class PostController @Inject()(cc: PostControllerComponents)(implicit ec: ExecutionContext)
+  extends PostBaseController(cc) {
 
-
-
-  def login = Action { Ok(counter.nextCount().toString) }
-
+  def show(id: String): Action[AnyContent] = PostAction.async { implicit request =>
+    postResourceHandler.lookup(id).map { post =>
+      Ok(Json.toJson(post))
+    }
+  }
 }
+
