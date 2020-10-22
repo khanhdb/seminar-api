@@ -1,19 +1,32 @@
 package controllers
 
-import javax.inject.Inject
-import play.api.libs.json.Json
+import javax.inject._
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.mvc._
+import services.Authenticator
 
-import scala.concurrent.ExecutionContext
 
+@Singleton
+class LoginController @Inject()(cc: ControllerComponents, authenticator: Authenticator) extends AbstractController(cc) {
 
-class PostController @Inject()(cc: PostControllerComponents)(implicit ec: ExecutionContext)
-  extends PostBaseController(cc) {
+  def login: Action[JsValue] = Action(parse.json) { request =>
+      request.body match {
+        case JsObject(underlying) =>
+          underlying.get("token") match {
+            case None =>
+              BadRequest("invalid payload format")
+            case Some(token) =>
+             val verified =  authenticator.verify(token.toString())
+              if (verified){
+                Ok("logged in")
+              } else {
+                Unauthorized("invalid token")
+              }
+          }
+        case _ =>
+          BadRequest("invalid payload format")
+      }
 
-  def show(id: String): Action[AnyContent] = PostAction.async { implicit request =>
-    postResourceHandler.lookup(id).map { post =>
-      Ok(Json.toJson(post))
     }
-  }
 }
 
