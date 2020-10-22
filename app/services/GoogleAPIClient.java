@@ -17,10 +17,9 @@ public class GoogleAPIClient {
     static final String CLIENT_ID = "1029227804631-mruhj3igh0sghcs8tkeu99va3nnc4gpo.apps.googleusercontent.com";
     static final String CLIENT_SECRET = "WbxqUQffNpoEohBtGEX_xNVL";
 
-
     private GoogleIdTokenVerifier verifier;
 
-    private GoogleAPIClient(String idTokenString){
+    private GoogleAPIClient(){
         HttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
@@ -29,7 +28,7 @@ public class GoogleAPIClient {
                 .build();
     }
 
-    private static GoogleAPIClient instance;
+    private static final GoogleAPIClient instance = new GoogleAPIClient();
 
     private static GoogleAPIClient getInstance(){
         return instance;
