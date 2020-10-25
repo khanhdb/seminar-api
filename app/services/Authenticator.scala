@@ -1,27 +1,19 @@
 package services
 
-import java.io.IOException
-import java.security.GeneralSecurityException
-
 import javax.inject._
 
+
+case class UserPayload(email : String, name : String)
+
 trait Authenticator {
-  def verify(token: String): Boolean
+  def verify(token: String): Option[UserPayload]
 }
 
 @Singleton
-class GoogleAuthenticator extends Authenticator {
-  override def verify(token: String): Boolean = {
-    try{
-      GoogleAPIClient.verify(token)
-    }catch {
-      case e : GeneralSecurityException =>
-        e.printStackTrace()
-        false
-      case ioe: IOException =>
-        ioe.printStackTrace()
-        false
+class GoogleAuthenticator @Inject()(googleAPIClient: GoogleAPIClient) extends Authenticator {
+  override def verify(token: String): Option[UserPayload] = {
+    googleAPIClient.verify(token).map{payload =>
+       UserPayload(payload.getEmail, payload.get("name").toString)
     }
-
   }
 }
