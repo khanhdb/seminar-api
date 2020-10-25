@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationInt
 class LoginController @Inject()(userRepository: UserRepository, cc: ControllerComponents, authenticator: Authenticator, implicit val databaseExecutionContext: DatabaseExecutionContext) extends AbstractController(cc) {
   private val logger: Logger = Logger(this.getClass)
 
-  def login: Action[JsValue] = Action(parse.json) { request =>
+  def login: Action[JsValue] = Action(parse.json) { implicit request =>
         request.body match {
             case JsObject(underlying) =>
               underlying.get("token") match {
@@ -35,7 +35,7 @@ class LoginController @Inject()(userRepository: UserRepository, cc: ControllerCo
   }
 
   def loginSuccessfullyResult(userPayload: UserPayload) : Result = {
-    Ok("logged in")
+    Redirect("/").withSession("connected" -> userPayload.email)
   }
 }
 
