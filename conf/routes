@@ -6,7 +6,9 @@
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 # An example controller showing how to use dependency injection
-POST     /login                      controllers.LoginController.login
+POST     /login                      controllers.AuthenticationController.login
+# An example controller showing how to use dependency injection
+GET     /logout                      controllers.AuthenticationController.logout
 # An example controller showing how to write asynchronous code
 GET     /message                    controllers.AsyncController.message
 
