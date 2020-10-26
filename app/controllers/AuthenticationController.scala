@@ -7,9 +7,8 @@ import play.api.libs.json.{JsObject, JsValue}
 import play.api.mvc._
 import services.{Authenticator, UserPayload}
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.DurationInt
-import scala.util.{Failure, Success}
+import scala.concurrent.{Await, Future}
 
 
 @Singleton
@@ -49,9 +48,10 @@ class AuthenticationController @Inject()(userRepository: UserRepository, cc: Con
     userRepository.allUsers.map(_.find(_.email.equals(userPayload.email))).map{
       case None =>
        Await.result(userRepository.create(userPayload.email, userPayload.name).map[Result]{
-          case true =>
-            Redirect("/").withSession("connected" -> userPayload.email)
           case false =>
+            logger.debug(s"created new user ${userPayload.email}")
+            Redirect("/").withSession("connected" -> userPayload.email)
+          case true =>
             logger.debug("unable to insert new user")
             Unauthorized
         }, 5 seconds)
