@@ -14,16 +14,17 @@ class GoogleAPIClient @Inject() (config : Configuration){
    private val logger = Logger(this.getClass)
 
    private val verifier :  GoogleIdTokenVerifier = {
-      val CLIENT_ID = config.underlying.getString("CLIENT_ID")
-      val CLIENT_SECRET = config.underlying.getString("CLIENT_SECRET")
-      val transport = new NetHttpTransport()
-      val jsonFactory = JacksonFactory.getDefaultInstance
-      new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-                .setAudience(Collections.singletonList(CLIENT_ID))
-                .build();
-    }
+     val CLIENT_ID = config.underlying.getString("CLIENT_ID")
+     val transport = new NetHttpTransport()
+     val jsonFactory = JacksonFactory.getDefaultInstance
+     new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+       .setAudience(Collections.singletonList(CLIENT_ID))
+       .build()
+   }
+
 
   def verify(idTokenString : String) : Option[GoogleIdToken.Payload]= {
+    val ACCEPTED_EMAIL_DOMAIN = config.underlying.getString("ACCEPTED_EMAIL_DOMAIN")
     try {
       Option(verifier.verify(idTokenString)) match {
         case None =>
@@ -31,9 +32,13 @@ class GoogleAPIClient @Inject() (config : Configuration){
           None
         case Some(idToken) =>
           val payload = idToken.getPayload
-          val userId = payload.getSubject
-          logger.debug("User ID: " + userId)
-          Some(payload)
+          logger.debug(s"User ID: ${payload.getSubject}")
+          payload.getHostedDomain match {
+            case ACCEPTED_EMAIL_DOMAIN =>
+              Some(payload)
+            case _ =>
+               None
+          }
       }
     } catch {
       case _ : Exception =>
