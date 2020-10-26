@@ -7,7 +7,7 @@ import play.api.libs.json.{JsObject, JsValue}
 import play.api.mvc._
 import services.{Authenticator, UserPayload}
 
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.Duration.Inf
 import scala.concurrent.{Await, Future}
 
 
@@ -54,7 +54,7 @@ class AuthenticationController @Inject()(userRepository: UserRepository, cc: Con
           case true =>
             logger.debug("unable to insert new user")
             Unauthorized
-        }, 5 seconds)
+        }, Inf)
 
       case Some(_) =>
         Redirect("/").withSession("connected" -> userPayload.email)
