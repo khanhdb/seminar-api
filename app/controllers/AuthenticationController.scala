@@ -7,8 +7,9 @@ import play.api.libs.json.{JsObject, JsValue}
 import play.api.mvc._
 import services.{Authenticator, UserPayload}
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.DurationInt
+import scala.util.{Failure, Success}
 
 
 @Singleton
@@ -25,27 +26,39 @@ class AuthenticationController @Inject()(userRepository: UserRepository, cc: Con
     }
   }
 
-  def login: Action[JsValue] = Action(parse.json) { implicit request =>
+  def login: Action[JsValue] = Action(parse.json).async{ implicit request =>
         request.body match {
             case JsObject(underlying) =>
               underlying.get("token") match {
                 case None =>
-                  BadRequest("invalid payload format")
+                  Future.successful(BadRequest("invalid payload format"))
                 case Some(token) =>
                   authenticator.verify(token.toString()) match {
                     case None =>
-                      Unauthorized("invalid token")
+                      Future.successful(Unauthorized("invalid token"))
                     case Some(userPayload) =>
                       loginSuccessfullyResult(userPayload)
                  }
               }
             case _ =>
-              BadRequest("invalid payload format")
+              Future.successful(BadRequest("invalid payload format"))
           }
   }
 
-  def loginSuccessfullyResult(userPayload: UserPayload) : Result = {
-    Redirect("/").withSession("connected" -> userPayload.email)
+  def loginSuccessfullyResult(userPayload: UserPayload) : Future[Result] = {
+    userRepository.allUsers.map(_.find(_.email.equals(userPayload.email))).map{
+      case None =>
+       Await.result(userRepository.create(userPayload.email, userPayload.name).map[Result]{
+          case true =>
+            Redirect("/").withSession("connected" -> userPayload.email)
+          case false =>
+            logger.debug("unable to insert new user")
+            Unauthorized
+        }, 5 seconds)
+
+      case Some(_) =>
+        Redirect("/").withSession("connected" -> userPayload.email)
+    }
   }
 }
 

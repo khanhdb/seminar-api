@@ -20,28 +20,27 @@ class  UserRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
    */
   private[models] val simple = {
     get[String]("user.email") ~ str("user.display_name") map {
-      case id ~ name => User(id, name)
+      case email ~ name => User(email, name)
     }
   }
 
 
-  /**
-   * Construct the Seq[(String,String)] needed to fill a select options set.
-   *
-   * Uses `SqlQueryResult.fold` from Anorm streaming,
-   * to accumulate the rows as an options list.
-   */
-  def options: Future[Seq[(String,String)]] = Future(db.withConnection { implicit connection =>
+  def create(email : String, name : String): Future[Boolean] = Future(db.withConnection { implicit connection =>
+    SQL"INSERT INTO User values ($email, $name)".execute()
+  })
+
+
+  def allUsers: Future[Seq[User]] = Future(db.withConnection { implicit connection =>
     SQL"select * from User".
-      fold(Seq.empty[(String, String)], ColumnAliaser.empty) { (acc, row) => // Anorm streaming
+      fold(Seq.empty[User], ColumnAliaser.empty) { (acc, row) => // Anorm streaming
         row.as(simple) match {
           case Failure(parseErr) => {
             println(s"Fails to parse $row: $parseErr")
             acc
           }
 
-          case Success(User(email, name)) =>
-            (email -> name) +: acc
+          case Success(user) =>
+            user +: acc
         }
       }
   }).flatMap {
