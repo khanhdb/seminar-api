@@ -1,6 +1,8 @@
 package models
 
-import anorm.SqlParser.{int, str}
+import java.util.Date
+
+import anorm.SqlParser.{date, int, str}
 import anorm._
 import javax.inject.Inject
 import play.api.db.DBApi
@@ -9,7 +11,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 
-case class Topic(id: Int, title: String, status : String, author: String)
+case class Topic(id: Int, title: String, status : String, author: String, createdAt : Date)
 
 @javax.inject.Singleton
 class TopicRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) {
@@ -20,14 +22,15 @@ class TopicRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
       int("Topic.topic_id") ~
       str("Topic.title") ~
       str("Topic.status") ~
-      str("Topic.author") map {
-      case id ~ title ~ status ~ author => Topic(id, title, status, author)
+      str("Topic.author") ~
+      date("Topic.created_at")  map {
+      case id ~ title ~ status ~ author ~ createdAt => Topic(id, title, status, author, createdAt)
     }
   }
 
 
-  def create(email : String, name : String): Future[Boolean] = Future(db.withConnection { implicit connection =>
-    SQL"INSERT INTO Topic values ($email, $name)".execute()
+  def create(title : String, author : String): Future[Boolean] = Future(db.withConnection { implicit connection =>
+    SQL"INSERT INTO Topic (title, author, status, created_at) values ($title, $author, 'N', CURRENT_DATE)".execute()
   })
 
 
