@@ -1,13 +1,31 @@
 name := "seminarAPI"
  
-version := "1.0" 
-      
-lazy val `seminarAPI` = (project in file(".")).enablePlugins(PlayScala)
+version := "1.0"
+
+packageDescription := "Seminar API"
+
+lazy val packagerSettings = Seq(
+  maintainer := "khanhdb@sandinh.net",
+  dockerBaseImage := "lwieske/java-8:server-jre-8u92",
+  dockerRepository := Some("r.bennuoc.com"),
+  dockerExposedPorts := Seq(9000),
+  version in Docker := "latest"
+)
+lazy val `seminarAPI` = (project in file(".")).
+  enablePlugins(PlayScala, DockerPlugin).
+  settings(packagerSettings)
+
+javacOptions in Universal ++= Seq(
+  // JVM memory tuning
+  "-J-Xmx1024m",
+  "-J-Xms512m",
+   s"-Dpidfile.path=/dev/null"
+)
 
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
       
 resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
-      
+
 scalaVersion := "2.12.2"
 
 val playDependencies =  Seq( jdbc , ehcache , ws , specs2 % Test , guice )
@@ -19,7 +37,5 @@ val otherDependencies = Seq(
 )
 
 libraryDependencies ++= playDependencies ++ otherDependencies
-
-unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  
 
       
