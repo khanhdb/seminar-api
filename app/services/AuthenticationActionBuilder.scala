@@ -7,7 +7,7 @@ import play.api.mvc.{ActionBuilderImpl, BodyParsers, Request, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticationAction @Inject()(parser: BodyParsers.Default)(implicit ec: ExecutionContext)
+class AuthenticationActionBuilder @Inject()(parser: BodyParsers.Default)(implicit ec: ExecutionContext)
     extends ActionBuilderImpl(parser){
 
   private val logger: Logger = Logger(this.getClass)

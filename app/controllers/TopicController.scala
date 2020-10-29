@@ -5,13 +5,13 @@ import models.{DatabaseExecutionContext, Topic, TopicRepository}
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc._
-import services.AuthenticationAction
+import services.AuthenticationActionBuilder
 
 import scala.concurrent.Future
 
 
 @Singleton
-class TopicController @Inject()(topicRepository: TopicRepository, auth : AuthenticationAction, cc: ControllerComponents, implicit val databaseExecutionContext: DatabaseExecutionContext) extends AbstractController(cc) {
+class TopicController @Inject()(topicRepository: TopicRepository, auth : AuthenticationActionBuilder, cc: ControllerComponents, implicit val databaseExecutionContext: DatabaseExecutionContext) extends AbstractController(cc) {
   private val logger: Logger = Logger(this.getClass)
 
   def topics : Action[AnyContent] = auth.async{ implicit request =>
