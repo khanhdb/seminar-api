@@ -6,12 +6,28 @@ import anorm.SqlParser.{date, int, str}
 import anorm._
 import javax.inject.Inject
 import play.api.db.DBApi
+import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
+object Status extends Enumeration {
+  val NEW = Value("N")
+  val ACTIVE = Value("A")
 
-case class Topic(id: Int, title: String, status : String, author: String, createdAt : Date)
+  Status.withName("A")
+}
+
+object Topic {
+  implicit val topicFormat = Json.format[Topic]
+  def toJson(topics : Seq[Topic]): JsValue = Json.toJson(topics)
+}
+
+case class Topic(id: Int, title: String, status : String, author: String, createdAt : Date){
+  def toJson : JsValue = {
+    Json.toJson(this)
+  }
+}
 
 @javax.inject.Singleton
 class TopicRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) {
@@ -24,7 +40,7 @@ class TopicRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
       str("Topic.status") ~
       str("Topic.author") ~
       date("Topic.created_at")  map {
-      case id ~ title ~ status ~ author ~ createdAt => Topic(id, title, status, author, createdAt)
+      case id ~ title ~ status ~ author ~ createdAt => Topic(id, title,  status, author, createdAt)
     }
   }
 

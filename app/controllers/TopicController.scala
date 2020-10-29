@@ -16,8 +16,7 @@ class TopicController @Inject()(topicRepository: TopicRepository, auth : Authent
 
   def topics : Action[AnyContent] = auth.async{ implicit request =>
      topicRepository.topics.map{topics =>
-        implicit val topicFormat = Json.format[Topic]
-        Ok(Json.toJson(topics))
+        Ok(Topic.toJson(topics))
     }
   }
 
