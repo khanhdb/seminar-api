@@ -1,12 +1,13 @@
 package services
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.mvc.Results.Unauthorized
 import play.api.mvc.{ActionBuilderImpl, BodyParsers, Request, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class AuthenticationActionBuilder @Inject()(parser: BodyParsers.Default)(implicit ec: ExecutionContext)
     extends ActionBuilderImpl(parser){
 

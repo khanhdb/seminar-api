@@ -49,6 +49,10 @@ class TopicRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
     SQL"INSERT INTO Topic (title, author, status, created_at) values ($title, $author, 'N', CURRENT_DATE)".execute()
   })
 
+  def update(title : String, email: String, id : String): Future[Boolean] = Future(db.withConnection {implicit connection =>
+    SQL"UPDATE Topic SET title=$title WHERE author = $email AND topic_id = $id".execute()
+  })
+
 
   def topics: Future[Seq[Topic]] = Future(db.withConnection { implicit connection =>
     SQL"select * from Topic".

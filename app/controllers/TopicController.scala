@@ -1,5 +1,7 @@
 package controllers
 
+import java.util.NoSuchElementException
+
 import javax.inject._
 import models.{DatabaseExecutionContext, Topic, TopicRepository}
 import play.api.Logger
@@ -28,9 +30,26 @@ class TopicController @Inject()(topicRepository: TopicRepository, auth : Authent
              case None =>
                Future.successful(BadRequest("wrong format"))
              case Some(title) =>
-               topicRepository.create(title.toString(), email).map(notCreated => if (notCreated) ServiceUnavailable else Created)
+               topicRepository.create(title.toString(), email).map(notCreated => if (notCreated) InternalServerError else Created)
            }
        case _ => Future.successful(BadRequest("wrong format"))
+    }
+  }
+
+  def update : Action[JsValue] = auth(parse.json).async { request =>
+    val email = request.session("connected")
+    request.body match {
+      case JsObject(underlying) =>
+        try {
+          val title = underlying("title")
+          val id = underlying("topic_id")
+          topicRepository.update(title.toString(), email, id.toString()).map(notUpdated => if (notUpdated) InternalServerError else Ok)
+        } catch {
+          case _ : NoSuchElementException =>
+            Future.successful(BadRequest("wrong format"))
+        }
+      case _ =>
+        Future.successful(BadRequest("wrong format"))
     }
   }
 }
