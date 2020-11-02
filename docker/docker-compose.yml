@@ -1,0 +1,25 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: mysql
+    restart: always
+    volumes:
+      - /opt/sd/seminar/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: semin@r
+
+
+  api:
+    image: r.bennuoc.com/seminarapi:latest
+    volumes:
+      - /opt/sd/seminar:/opt/docker/logs
+    environment:
+      DB: 'jdbc:mysql://db/seminar'
+    restart: always
+
+    depends_on:
+      - db
+    ports:
+      - 9000:9000
