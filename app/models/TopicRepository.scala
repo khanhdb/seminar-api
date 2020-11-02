@@ -14,8 +14,6 @@ import scala.util.{Failure, Success}
 object Status extends Enumeration {
   val NEW = Value("N")
   val ACTIVE = Value("A")
-
-  Status.withName("A")
 }
 
 object Topic {
@@ -35,7 +33,7 @@ class TopicRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
   private val db = dbapi.database("default")
 
   private[models] val simple = {
-      int("Topic.topic_id") ~
+      int("Topic.id") ~
       str("Topic.title") ~
       str("Topic.status") ~
       str("Topic.author") ~
@@ -46,11 +44,11 @@ class TopicRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
 
 
   def create(title : String, author : String): Future[Boolean] = Future(db.withConnection { implicit connection =>
-    SQL"INSERT INTO Topic (title, author, status, created_at) values ($title, $author, 'N', CURRENT_DATE)".execute()
+    SQL"INSERT INTO Topic (title, author, status, created_at) values ($title, $author, 'N', CURRENT_TIMESTAMP())".execute()
   })
 
   def update(title : String, email: String, id : String): Future[Boolean] = Future(db.withConnection {implicit connection =>
-    SQL"UPDATE Topic SET title=$title WHERE author = $email AND topic_id = $id".execute()
+    SQL"UPDATE Topic SET title=$title WHERE author = $email AND id = $id".execute()
   })
 
 
