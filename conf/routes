@@ -13,6 +13,8 @@ GET  /logout                      controllers.AuthenticationController.logout
 GET /topics                         controllers.TopicController.topics
 
 POST /topics                     controllers.TopicController.create
+
+PUT /topics                     controllers.TopicController.update
 # An example controller showing how to use dependency injection
 
 
