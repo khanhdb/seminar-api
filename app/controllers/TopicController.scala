@@ -30,7 +30,7 @@ class TopicController @Inject()(topicRepository: TopicRepository, auth : Authent
              case None =>
                Future.successful(BadRequest("wrong format"))
              case Some(title) =>
-               topicRepository.create(title.toString(), email).map(notCreated => if (notCreated) InternalServerError else Created)
+               topicRepository.create(title.as[String], email).map(notCreated => if (notCreated) InternalServerError else Created)
            }
        case _ => Future.successful(BadRequest("wrong format"))
     }
@@ -43,7 +43,7 @@ class TopicController @Inject()(topicRepository: TopicRepository, auth : Authent
         try {
           val title = underlying("title")
           val id = underlying("topic_id")
-          topicRepository.update(title.toString(), email, id.toString()).map(notUpdated => if (notUpdated) InternalServerError else Ok)
+          topicRepository.update(title.as[String], email, id.toString()).map(notUpdated => if (notUpdated) InternalServerError else Ok)
         } catch {
           case _ : NoSuchElementException =>
             Future.successful(BadRequest("wrong format"))
