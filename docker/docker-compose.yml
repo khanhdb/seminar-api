@@ -1,5 +1,7 @@
+version: '3.1'
+
 services:
-  db:
+  mysql_database:
     image: mysql
     restart: always
     volumes:
@@ -12,9 +14,9 @@ services:
     volumes:
       - /opt/sd/seminar:/opt/docker/logs
     environment:
-      DB: 'jdbc:mysql://db/seminar'
+      DB: 'jdbc:mysql://mysql_database/seminar'
     restart: always
     depends_on:
-      - db
+      - mysql_database
     ports:
       - 9000:9000
