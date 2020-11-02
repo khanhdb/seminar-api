@@ -8,7 +8,7 @@ import play.api.db.DBApi
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-case class User(email: String, displayName: String)
+case class User(email: String, name: String)
 
 @javax.inject.Singleton
 class  UserRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) {
@@ -19,14 +19,14 @@ class  UserRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
    * Parse a User from a ResultSet
    */
   private[models] val simple = {
-    get[String]("user.email") ~ str("user.display_name") map {
+    get[String]("user.email") ~ str("user.name") map {
       case email ~ name => User(email, name)
     }
   }
 
 
   def create(email : String, name : String): Future[Boolean] = Future(db.withConnection { implicit connection =>
-    SQL"INSERT INTO User values ($email, $name)".execute()
+    SQL"INSERT INTO User(email, name) values($email, $name)".execute()
   })
 
 
