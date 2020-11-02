@@ -8,9 +8,9 @@ GET  /                           controllers.HomeController.index
 # An example controller showing how to use dependency injection
 POST /login                      controllers.AuthenticationController.login
 
-GET  /logout                      controllers.AuthenticationController.logout
+GET  /logout                    controllers.AuthenticationController.logout
 
-GET /topics                         controllers.TopicController.topics
+GET /topics                      controllers.TopicController.topics
 
 POST /topics                     controllers.TopicController.create
 
