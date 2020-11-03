@@ -36,7 +36,6 @@ class EventRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
     }
   }
 
-
   def create(startTime : Date, endTime : Date): Future[Boolean] = Future(db.withConnection { implicit connection =>
     SQL"INSERT INTO Event (start_time, end_time) values ($startTime, $endTime)".execute()
   })

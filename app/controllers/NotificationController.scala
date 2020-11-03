@@ -29,7 +29,7 @@ class NotificationController @Inject()(repository : NotificationRepository, auth
              try {
                val subject = underlying("subject")
                val notifyTo = underlying("notify_to")
-               repository.create(subject.as[String], notifyTo.as[String]).map(notUpdated => if (notUpdated) InternalServerError else Ok)
+               repository.create(subject.as[String], notifyTo.as[String]).map(notUpdated => if (notUpdated) InternalServerError else Created)
              } catch {
                case _ : NoSuchElementException =>
                  Future.successful(BadRequest("wrong format"))
