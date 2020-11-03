@@ -4,11 +4,19 @@ import anorm.SqlParser.{get, str}
 import anorm._
 import javax.inject.Inject
 import play.api.db.DBApi
+import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-case class User(email: String, name: String)
+case class User(email: String, name: String, displayName : Option[String] = None)
+
+object User{
+  def toJson(users: Seq[User]) : JsValue= {
+    implicit val format = Json.format[User]
+    Json.toJson(users)
+  }
+}
 
 @javax.inject.Singleton
 class  UserRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) {
@@ -19,7 +27,8 @@ class  UserRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
    * Parse a User from a ResultSet
    */
   private[models] val simple = {
-    get[String]("user.email") ~ str("user.name") map {
+    get[String]("User.email") ~
+    str("User.name") map {
       case email ~ name => User(email, name)
     }
   }
