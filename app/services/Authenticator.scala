@@ -15,6 +15,6 @@ class GoogleAuthenticator @Inject()(googleAPIClient: GoogleAPIClient) extends Au
 //    googleAPIClient.verify(token).map{payload =>
 //       UserPayload(payload.getEmail, payload.get("name").toString)
 //    }
-    Some(UserPayload("khanhdb@sandinh.net", "Donal Trump"))
+    Some(UserPayload("thinhnv@sandinh.net", "super user"))
   }
 }

@@ -32,7 +32,8 @@ val playDependencies =  Seq( jdbc , ehcache , ws , specs2 % Test , guice )
 val otherDependencies = Seq(
   "com.google.api-client" % "google-api-client" % "1.30.10",
   "mysql" % "mysql-connector-java" % "8.0.22",
-  "com.typesafe.play" %% "anorm" % "2.5.3"
+  "com.typesafe.play" %% "anorm" % "2.5.3",
+  "com.google.firebase" % "firebase-admin" %"7.0.1"
 
 )
 

@@ -21,7 +21,9 @@ object Notification {
   def toJson(notifications : Seq[Notification]): JsValue = Json.toJson(notifications)
 }
 
-case class Notification(id: Long, subject: String, status: String, belongTo : String, createdAt : Date, updatedAt : Option[Date])
+case class Notification(id: Long, subject: String, status: String, notify_to : String, createdAt : Date, updatedAt : Option[Date]){
+  lazy val statusEnum = NotificationStatus.withName(status)
+}
 
 @javax.inject.Singleton
 class NotificationRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) {

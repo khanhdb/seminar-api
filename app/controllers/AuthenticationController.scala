@@ -1,18 +1,20 @@
 package controllers
 
+import com.google.firebase.FirebaseApp
 import javax.inject._
-import models.{DatabaseExecutionContext, UserRepository}
-import play.api.Logger
+import models.{DatabaseExecutionContext, NotificationRepository, NotificationStatus, UserRepository}
+import play.api.{Configuration, Logger}
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.mvc._
-import services.{Authenticator, UserPayload}
+import services.{Authenticator, PushNotificationService, UserPayload}
 
 import scala.concurrent.duration.Duration.Inf
 import scala.concurrent.{Await, Future}
-
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.Message
 
 @Singleton
-class AuthenticationController @Inject()(userRepository: UserRepository, cc: ControllerComponents, authenticator: Authenticator, implicit val databaseExecutionContext: DatabaseExecutionContext) extends AbstractController(cc) {
+class AuthenticationController @Inject()(config : Configuration, pushNotificationService: PushNotificationService, userRepository: UserRepository, notificationRepository: NotificationRepository, cc: ControllerComponents, authenticator: Authenticator, implicit val databaseExecutionContext: DatabaseExecutionContext) extends AbstractController(cc) {
   private val logger: Logger = Logger(this.getClass)
 
   def logout: Action[AnyContent] = Action{ implicit request =>
@@ -56,8 +58,17 @@ class AuthenticationController @Inject()(userRepository: UserRepository, cc: Con
             Unauthorized
         }, Inf)
 
-      case Some(_) =>
+      case Some(user) =>
+        this.notify(user.email)
         Redirect("/").withSession("connected" -> userPayload.email)
+    }
+  }
+
+  private def notify(email: String): Unit = {
+    notificationRepository.notifications(email).foreach{ notifications =>
+       notifications.filter(_.statusEnum == NotificationStatus.NEW).foreach{notification =>
+         pushNotificationService.sendToAll(Map("notification" -> notification.subject))
+       }
     }
   }
 }
