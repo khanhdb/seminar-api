@@ -2,7 +2,7 @@ package models
 
 import java.util.Date
 
-import anorm.SqlParser.{date, int, str}
+import anorm.SqlParser.{date, int, str, get}
 import anorm._
 import javax.inject.Inject
 import play.api.db.DBApi
@@ -21,7 +21,8 @@ object Topic {
   def toJson(topics : Seq[Topic]): JsValue = Json.toJson(topics)
 }
 
-case class Topic(id: Int, title: String, status : String, author: String, createdAt : Date){
+case class Topic(id: Int, title: String, status : String, author: String, link : Option[String],
+                 description : Option[String], time : Date, updatedAt : Option[Date], createdAt : Date){
   def toJson : JsValue = {
     Json.toJson(this)
   }
@@ -37,18 +38,23 @@ class TopicRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
       str("Topic.title") ~
       str("Topic.status") ~
       str("Topic.author") ~
+      get[Option[String]]("Topic.link") ~
+      get[Option[String]]("Topic.description") ~
+      date("Topic.time") ~
+      get[Option[Date]]("Topic.updated_at") ~
       date("Topic.created_at")  map {
-      case id ~ title ~ status ~ author ~ createdAt => Topic(id, title,  status, author, createdAt)
+      case id ~ title ~ status ~ author ~ link ~ description ~ time ~ updatedAt ~ createdAt =>
+        Topic(id, title,  status, author, link, description, time, updatedAt, createdAt)
     }
   }
 
 
-  def create(title : String, author : String): Future[Boolean] = Future(db.withConnection { implicit connection =>
-    SQL"INSERT INTO Topic (title, author, status, created_at) values ($title, $author, 'N', CURRENT_TIMESTAMP())".execute()
+  def create(title : String, author : String, link : String, description : String, time : Date): Future[Boolean] = Future(db.withConnection { implicit connection =>
+    SQL"INSERT INTO Topic (title, author, link, description, time, status, created_at) values ($title, $author,$link, $description, $time, 'N', CURRENT_TIMESTAMP())".execute()
   })
 
-  def update(title : String, email: String, id : String): Future[Boolean] = Future(db.withConnection {implicit connection =>
-    SQL"UPDATE Topic SET title=$title WHERE author = $email AND id = $id".execute()
+  def update(title : String, author : String, link : String, description : String, time : Date, id : Int): Future[Boolean] = Future(db.withConnection {implicit connection =>
+    SQL"UPDATE Topic SET title=$title, link=$link, description=$description, time=$time WHERE author = $author AND id = $id".execute()
   })
 
 
