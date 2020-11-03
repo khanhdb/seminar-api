@@ -12,9 +12,11 @@ services:
   api:
     image: r.bennuoc.com/seminarapi:latest
     volumes:
-      - /opt/sd/seminar:/opt/docker/logs
+      - /opt/sd/seminar/logs:/opt/docker/logs
+      - /opt/sd/seminar/secrets:/secret
     environment:
       DB: 'jdbc:mysql://mysql_database/seminar'
+      GOOGLE_APPLICATION_CREDENTIALS: '/secret/seminar-api-5401e82f6173.json'
     restart: always
     depends_on:
       - mysql_database

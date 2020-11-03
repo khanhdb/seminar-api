@@ -18,13 +18,9 @@ trait PushNotificationService {
 
 @Singleton
 class FirebasePushNotification @Inject() (config : Configuration) extends PushNotificationService {
-  private val privateKeys = new FileInputStream("/Users/khanhdb/Downloads/seminar-api-5401e82f6173.json")
   private val logger: Logger = Logger(this.getClass)
-  private val options: FirebaseOptions = FirebaseOptions.builder
-    .setCredentials(GoogleCredentials.fromStream(privateKeys))
-    .build
   private val appName = config.underlying.getString(AppConstant.FIREBASE_APP_NAME)
-  FirebaseApp.initializeApp(options, appName)
+  FirebaseApp.initializeApp(appName)
 
   private lazy val instance: FirebaseMessaging = FirebaseMessaging.getInstance(FirebaseApp.getInstance(appName))
 
