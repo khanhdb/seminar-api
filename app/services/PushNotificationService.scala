@@ -1,11 +1,8 @@
 package services
 
 
-import java.io.FileInputStream
-
-import com.google.auth.oauth2.GoogleCredentials
+import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.{FirebaseMessaging, Message}
-import com.google.firebase.{FirebaseApp, FirebaseOptions}
 import contant.AppConstant
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
@@ -23,7 +20,6 @@ class FirebasePushNotification @Inject() (config : Configuration) extends PushNo
   FirebaseApp.initializeApp(appName)
 
   private lazy val instance: FirebaseMessaging = FirebaseMessaging.getInstance(FirebaseApp.getInstance(appName))
-
 
   override def sendToAll(data: Map[String, String]): Unit = {
     val topic = "notification"
