@@ -12,9 +12,8 @@ trait Authenticator {
 @Singleton
 class GoogleAuthenticator @Inject()(googleAPIClient: GoogleAPIClient) extends Authenticator {
   override def verify(token: String): Option[UserPayload] = {
-//    googleAPIClient.verify(token).map{payload =>
-//       UserPayload(payload.getEmail, payload.get("name").toString)
-//    }
-    Some(UserPayload("thinhnv@sandinh.net", "super user"))
+    googleAPIClient.verify(token).map{payload =>
+       UserPayload(payload.getEmail, payload.get("name").toString)
+    }
   }
 }
