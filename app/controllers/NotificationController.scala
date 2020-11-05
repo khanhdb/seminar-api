@@ -17,10 +17,15 @@ class NotificationController @Inject()(repository : NotificationRepository, auth
   private val logger: Logger = Logger(this.getClass)
 
   def notifications: Action[AnyContent] = auth.async{ implicit request =>
-    val email = request.session("connected")
+    val email = request.session("email")
      repository.notifications(email).map{notifications =>
         Ok(Notification.toJson(notifications))
     }
+  }
+
+  def seen(id : Int) : Action[AnyContent] = auth.async{ request =>
+    val email = request.session("email")
+    repository.changeStatus(email, id).map(notUpdated => if (notUpdated) InternalServerError else Ok)
   }
 
   def create : Action[JsValue] = auth(parse.json).async{ implicit request =>

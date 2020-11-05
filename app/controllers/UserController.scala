@@ -10,7 +10,7 @@ class UserController  @Inject()(repository : UserRepository, auth : Authenticati
   private val logger: Logger = Logger(this.getClass)
 
   def users : Action[AnyContent] = auth.async{ implicit request =>
-    val email = request.session("connected")
+    val email = request.session("email")
     repository.allUsers.map{users =>
       Ok(User.toJson(users.filterNot(_.email.equals(email))))
     }

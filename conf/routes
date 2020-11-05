@@ -9,8 +9,10 @@ GET /topics                      controllers.TopicController.topics
 POST /topics                     controllers.TopicController.create
 PUT /topics                     controllers.TopicController.update
 
+
 GET /notifications                     controllers.NotificationController.notifications
 POST /notifications                     controllers.NotificationController.create
+GET /notifications/seen/:id                     controllers.NotificationController.seen(id: Int)
 
 
 GET /events                     controllers.EventController.events

@@ -46,6 +46,10 @@ class NotificationRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecut
     SQL"INSERT INTO Notification (subject, status, notify_to, created_at) values ($subject, 'N', $notifyTo, CURRENT_TIMESTAMP())".execute()
   })
 
+  def changeStatus(notifyTo : String, id : Int): Future[Boolean] = Future(db.withConnection{ implicit  connection =>
+    SQL"UPDATE Notification SET status = 'S', updated_at = CURRENT_TIMESTAMP() WHERE notify_to=$notifyTo AND id=$id".execute()
+  })
+
 
   def notifications(email : String): Future[Seq[Notification]] = Future(db.withConnection { implicit connection =>
     SQL"select * from Notification where notify_to = $email".

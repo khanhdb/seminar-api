@@ -1,4 +1,4 @@
-package services;
+package services
 
 import java.util.Collections
 
@@ -9,9 +9,11 @@ import contant.AppConstant
 import javax.inject.Inject
 import play.api.{Configuration, Logger}
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseToken
 
 @Inject
-class GoogleAPIClient @Inject() (config : Configuration){
+class FireBaseAuthentication @Inject()(config : Configuration, fire: FirebasePushNotification){
 
    private val logger = Logger(this.getClass)
 
@@ -28,19 +30,22 @@ class GoogleAPIClient @Inject() (config : Configuration){
   def verify(idTokenString : String) : Option[GoogleIdToken.Payload]= {
     val ACCEPTED_EMAIL_DOMAIN = config.underlying.getString(AppConstant.ACCEPTED_EMAIL_DOMAIN)
     try {
-      Option(verifier.verify(idTokenString)) match {
+
+      val decodedToken = FirebaseAuth.getInstance(fire.firebaseApp).verifyIdToken(idTokenString)
+      val email = decodedToken.getEmail
+      Option(email) match {
         case None =>
           logger.debug("Invalid ID token.")
           None
-        case Some(idToken) =>
-          val payload = idToken.getPayload
-          logger.debug(s"User ID: ${payload.getSubject}")
-          payload.getHostedDomain match {
-            case ACCEPTED_EMAIL_DOMAIN =>
-              Some(payload)
-            case _ =>
-               None
-          }
+        case Some(email) =>
+//          val payload = idToken.getPayload
+//          logger.debug(s"User ID: ${payload.getSubject}")
+//          payload.getHostedDomain match {
+//            case ACCEPTED_EMAIL_DOMAIN =>
+//              Some(payload)
+//            case _ =>
+//               None
+           None
       }
     } catch {
       case e : Exception =>

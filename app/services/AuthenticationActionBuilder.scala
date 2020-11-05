@@ -14,7 +14,7 @@ class AuthenticationActionBuilder @Inject()(parser: BodyParsers.Default)(implici
   private val logger: Logger = Logger(this.getClass)
 
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
-      request.session.get("connected") match {
+      request.session.get("email") match {
         case None =>
           Future.successful(Unauthorized)
         case Some(email) =>

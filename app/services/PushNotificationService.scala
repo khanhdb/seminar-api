@@ -17,7 +17,7 @@ trait PushNotificationService {
 class FirebasePushNotification @Inject() (config : Configuration) extends PushNotificationService {
   private val logger: Logger = Logger(this.getClass)
   private val appName = config.underlying.getString(AppConstant.FIREBASE_APP_NAME)
-  FirebaseApp.initializeApp(appName)
+  val firebaseApp = FirebaseApp.initializeApp(appName)
 
   private lazy val instance: FirebaseMessaging = FirebaseMessaging.getInstance(FirebaseApp.getInstance(appName))
 

@@ -5,7 +5,7 @@ import java.util.{Date, NoSuchElementException}
 import javax.inject._
 import models.{DatabaseExecutionContext, Topic, TopicRepository}
 import play.api.Logger
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.mvc._
 import services.AuthenticationActionBuilder
 
@@ -23,7 +23,7 @@ class TopicController @Inject()(topicRepository: TopicRepository, auth : Authent
   }
 
   def create : Action[JsValue] = auth(parse.json).async{ implicit request =>
-    val author = request.session("connected")
+    val author = request.session("email")
     request.body match {
        case JsObject(underlying) =>
          try {
@@ -41,7 +41,7 @@ class TopicController @Inject()(topicRepository: TopicRepository, auth : Authent
   }
 
   def update : Action[JsValue] = auth(parse.json).async { request =>
-    val author = request.session("connected")
+    val author = request.session("email")
     request.body match {
       case JsObject(underlying) =>
         try {
