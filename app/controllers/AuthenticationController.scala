@@ -34,7 +34,7 @@ class AuthenticationController @Inject()(config : Configuration, pushNotificatio
                 case None =>
                   Future.successful(BadRequest("invalid payload format"))
                 case Some(token) =>
-                  authenticator.verify(token.toString()) match {
+                  authenticator.verify(token.as[String]) match {
                     case None =>
                       Future.successful(Unauthorized("invalid token"))
                     case Some(userPayload) =>
