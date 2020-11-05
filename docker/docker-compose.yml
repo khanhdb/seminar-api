@@ -16,7 +16,7 @@ services:
       - /opt/sd/seminar/secrets:/secret
     environment:
       DB: 'jdbc:mysql://mysql_database/seminar'
-      GOOGLE_APPLICATION_CREDENTIALS: '/secret/seminar-api-5401e82f6173.json'
+      GOOGLE_APPLICATION_CREDENTIALS: '/secret/seminar-api-293116-firebase-adminsdk-b85v2-3b44dad9b7.json'
     restart: always
     depends_on:
       - mysql_database
