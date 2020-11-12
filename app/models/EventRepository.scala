@@ -9,7 +9,6 @@ import play.api.db.DBApi
 import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 object EventStatus extends Enumeration {
   val NEW = Value("N")
@@ -24,11 +23,9 @@ object Event {
 case class Event(id : Int, startTime : Date, endTime : Date)
 
 @javax.inject.Singleton
-class EventRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) {
+class EventRepository @Inject()(api: DBApi)(implicit ec: DatabaseExecutionContext) extends AbstractRepository[Event](api){
 
-  private val db = dbapi.database("default")
-
-  private[models] val simple = {
+  override protected def rowParser: RowParser[Event] = {
       int("Event.id") ~
       date("Event.start_time") ~
       date("Event.end_time") map {
@@ -40,22 +37,5 @@ class EventRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
     SQL"INSERT INTO Event (start_time, end_time) values ($startTime, $endTime)".execute()
   })
 
-
-  def events: Future[Seq[Event]] = Future(db.withConnection { implicit connection =>
-    SQL"select * from Event".
-      fold(Seq.empty[Event], ColumnAliaser.empty) { (acc, row) => // Anorm streaming
-        row.as(simple) match {
-          case Failure(parseErr) => {
-            println(s"Fails to parse $row: $parseErr")
-            acc
-          }
-          case Success(event) =>
-            event +: acc
-        }
-      }
-  }).flatMap {
-    case Left(err :: _) => Future.failed(err)
-    case Left(_) => Future(Seq.empty)
-    case Right(acc) => Future.successful(acc.reverse)
-  }
+  def events: Future[Seq[Event]] = super.query("SELECT * FROM Event")
 }

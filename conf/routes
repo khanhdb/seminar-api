@@ -11,6 +11,9 @@ PUT /topics                     controllers.TopicController.update
 
 POST /topics/:id/invites                     controllers.TopicController.createInvite(id : Int)
 
+# fetch all user invites
+GET /invites                controllers.InviteController.invites
+
 
 GET /notifications                     controllers.NotificationController.notifications
 POST /notifications                     controllers.NotificationController.create
