@@ -25,7 +25,7 @@ class InviteController @Inject()(repository : InviteRepository, auth : Authentic
       case JsObject(map) =>
         try {
           val id = map("id").as[Int]
-          val topicId = map("topic_id").as[Int]
+          val topicId = map("topicId").as[Int]
           val status = map("status").as[String]
           repository.updateStatus(id, topicId, email, status).map{ notUpdated =>
             if (notUpdated) InternalServerError("failed to update") else Ok
