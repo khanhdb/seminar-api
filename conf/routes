@@ -12,11 +12,13 @@ PUT /topics                     controllers.TopicController.update
 # GET /topics/:id                controllers.TopicController.topics
 POST /topics/:id/invites       controllers.TopicController.createInvite(id : Int)
 
-# fetch all user invites
+# fetch all user's invites
 GET /invites                controllers.InviteController.invites
+
+# change status
 PUT /invites             controllers.InviteController.update
 
-
+# fetch all user's notification
 GET /notifications                     controllers.NotificationController.notifications
 POST /notifications                     controllers.NotificationController.create
 GET /notifications/seen/:id                     controllers.NotificationController.seen(id: Int)
