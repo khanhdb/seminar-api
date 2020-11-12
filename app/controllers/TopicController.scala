@@ -23,6 +23,11 @@ class TopicController @Inject()(inviteRepository: InviteRepository, topicReposit
     }
   }
 
+  def topic(id : Int) : Action[AnyContent] = auth.async{implicit request =>
+    // TODO implement
+    return null
+  }
+
   def create: Action[JsValue] = auth(parse.json).async { implicit request =>
     val author = request.session("email")
     request.body match {

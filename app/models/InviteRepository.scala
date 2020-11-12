@@ -11,8 +11,10 @@ import play.api.libs.json.{JsValue, Json}
 import scala.concurrent.Future
 
 object InviteStatus extends Enumeration {
-  val NEW = Value("N")
-  val FINISHED = Value("F")
+  val PENDING = Value("P")
+  val ACCEPT = Value("A")
+  val INTERESTED = Value("I")
+  val REJECT = Value("X")
 }
 
 object Invite {
@@ -24,8 +26,13 @@ case class Invite(id : Int, topicId : Int, status : String, inviteTo : String, c
 
 @javax.inject.Singleton
 class InviteRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) extends AbstractRepository [Invite](dbapi){
+
   def create(topicId : Int, inviteTo : String): Future[Boolean] = Future(db.withConnection { implicit connection =>
     SQL"INSERT INTO Invite  (topic_id, status, invite_to, created_at) values ($topicId, 'N', $inviteTo, CURRENT_TIMESTAMP())".execute()
+  })
+
+  def updateStatus(id : Int, topicId : Int, inviteTo: String, newStatus: String) = Future(db.withConnection { implicit connection =>
+    SQL"UPDATE Invite SET status=$newStatus, UPDATED_AT=CURRENT_TIMESTAMP() WHERE id=$id AND topic_id=$topicId AND invite_to=$inviteTo".execute()
   })
 
   def invites(inviteTo : String): Future[Seq[Invite]] = super.query(s"SELECT * FROM Invite WHERE invite_to='$inviteTo'")

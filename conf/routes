@@ -9,10 +9,12 @@ GET /topics                      controllers.TopicController.topics
 POST /topics                     controllers.TopicController.create
 PUT /topics                     controllers.TopicController.update
 
-POST /topics/:id/invites                     controllers.TopicController.createInvite(id : Int)
+GET /topics/:id                controllers.TopicController.topics
+POST /topics/:id/invites       controllers.TopicController.createInvite(id : Int)
 
 # fetch all user invites
 GET /invites                controllers.InviteController.invites
+PUT /invites             controllers.InviteController.update
 
 
 GET /notifications                     controllers.NotificationController.notifications
