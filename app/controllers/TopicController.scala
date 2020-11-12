@@ -71,7 +71,7 @@ class TopicController @Inject()(inviteRepository: InviteRepository, topicReposit
       case JsArray(inviteArray) =>
         val createFuture = inviteArray.map {
           case JsObject(map) =>
-            val inviteTo = map("invite_to")
+            val inviteTo = map("inviteTo")
             inviteRepository.create(topicId, inviteTo.as[String])
         }
 
