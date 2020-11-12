@@ -10,10 +10,8 @@ trait Authenticator {
 }
 
 @Singleton
-class GoogleAuthenticator @Inject()(googleAPIClient: GoogleAPIClient) extends Authenticator {
+class GoogleAuthenticator @Inject()(fire: FireBaseAuthentication) extends Authenticator {
   override def verify(token: String): Option[UserPayload] = {
-    googleAPIClient.verify(token).map{payload =>
-       UserPayload(payload.getEmail, payload.get("name").toString)
-    }
+    fire.verify(token)
   }
 }
