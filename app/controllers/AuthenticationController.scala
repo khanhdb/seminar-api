@@ -20,7 +20,7 @@ class AuthenticationController @Inject()(config : Configuration, pushNotificatio
         logger.debug("user has no session")
         Unauthorized("you are not in any session")
       case Some(_) =>
-        Redirect("/").withNewSession
+        Ok.withNewSession
     }
   }
 
@@ -49,7 +49,7 @@ class AuthenticationController @Inject()(config : Configuration, pushNotificatio
        Await.result(userRepository.create(userPayload.email, userPayload.name).map[Result]{
           case false =>
             logger.debug(s"created new user ${userPayload.email}")
-            Redirect("/").withSession("email" -> userPayload.email, "name" -> userPayload.name)
+            Ok.withSession("email" -> userPayload.email, "name" -> userPayload.name)
           case true =>
             logger.debug("unable to insert new user")
             Unauthorized
@@ -57,7 +57,7 @@ class AuthenticationController @Inject()(config : Configuration, pushNotificatio
 
       case Some(user) =>
         this.notify(user.email)
-        Redirect("/").withSession("email" -> userPayload.email, "name" -> userPayload.name)
+        Ok.withSession("email" -> userPayload.email, "name" -> userPayload.name)
     }
   }
 
