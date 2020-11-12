@@ -31,7 +31,7 @@ class InviteRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCon
   def invites(inviteTo : String): Future[Seq[Invite]] = super.query(s"SELECT * FROM Invite WHERE invite_to='$inviteTo'")
 
   override protected def rowParser: RowParser[Invite] =
-    int("Invite.id") ~
+      int("Invite.id") ~
       int("Invite.topic_id") ~
       str("Invite.status") ~
       str("Invite.invite_to") ~
