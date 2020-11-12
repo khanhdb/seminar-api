@@ -10,7 +10,8 @@ import play.api.{Configuration, Logger}
 import scala.collection.JavaConverters.mapAsJavaMapConverter
 
 trait PushNotificationService {
-  def sendToAll(data : Map[String, String])
+  def notify(data : Map[String, String])
+  def send(data: Map[String, String], topic: String)
 }
 
 @Singleton
@@ -21,10 +22,14 @@ class FirebasePushNotification @Inject() (config : Configuration) extends PushNo
 
   private lazy val instance: FirebaseMessaging = FirebaseMessaging.getInstance(FirebaseApp.getInstance(appName))
 
-  override def sendToAll(data: Map[String, String]): Unit = {
+  override def notify(data: Map[String, String]): Unit = {
     val topic = "notification"
+    send(data, topic)
+  }
+
+  override def send(data: Map[String, String], topic: String): Unit = {
     val message = Message.builder.putAllData(data.asJava).setTopic(topic).build
     val response = this.instance.send(message)
-    logger.debug(s"message sent successfully ${response}")
+    logger.debug(s"message sent successfully $response")
   }
 }

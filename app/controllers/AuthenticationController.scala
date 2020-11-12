@@ -64,7 +64,7 @@ class AuthenticationController @Inject()(config : Configuration, pushNotificatio
   private def notify(email: String): Unit = {
     notificationRepository.notifications(email).foreach{ notifications =>
        notifications.filter(_.statusEnum == NotificationStatus.NEW).foreach{notification =>
-         pushNotificationService.sendToAll(Map("notification" -> notification.subject))
+         pushNotificationService.notify(Map("notification" -> notification.subject))
        }
     }
   }
