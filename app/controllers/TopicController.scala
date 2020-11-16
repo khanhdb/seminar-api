@@ -73,6 +73,7 @@ class TopicController @Inject()(inviteRepository: InviteRepository, topicReposit
           case JsObject(map) =>
             val inviteTo = map("inviteTo")
             inviteRepository.create(topicId, inviteTo.as[String])
+          case _ => Future.successful(true)
         }
 
         Future.sequence(createFuture).map{ results =>
