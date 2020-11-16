@@ -59,7 +59,7 @@ class TopicRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
 
 
   def topics: Future[Seq[Topic]] = Future(db.withConnection { implicit connection =>
-    SQL"select * from Topic".
+    SQL"select * from Topic ORDER BY time".
       fold(Seq.empty[Topic], ColumnAliaser.empty) { (acc, row) => // Anorm streaming
         row.as(simple) match {
           case Failure(parseErr) => {
