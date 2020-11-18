@@ -2,7 +2,7 @@ package models
 
 import java.util.Date
 
-import anorm.SqlParser.{date, int, str, get}
+import anorm.SqlParser.{date, get, int, str}
 import anorm._
 import javax.inject.Inject
 import play.api.db.DBApi
