@@ -6,6 +6,9 @@ POST /login                      controllers.AuthenticationController.login
 GET  /logout                    controllers.AuthenticationController.logout
 
 GET /topics                      controllers.TopicController.topics
+GET /topics/:id/ratings      controllers.TopicController.ratings(id : Int)
+POST /topics/:id/ratings      controllers.TopicController.createRating(id : Int)
+
 POST /topics                     controllers.TopicController.create
 PUT /topics                     controllers.TopicController.update
 

@@ -3,18 +3,17 @@ package controllers
 import java.util.{Date, NoSuchElementException}
 
 import javax.inject._
-import models.{DatabaseExecutionContext, InviteRepository, Topic, TopicRepository}
+import models.{DatabaseExecutionContext, InviteRepository, Rating, RatingRepository, Topic, TopicRepository}
 import play.api.Logger
 import play.api.libs.json.{JsArray, JsObject, JsValue}
 import play.api.mvc._
 import services.AuthenticationActionBuilder
 
-import scala.concurrent.duration.Duration.Inf
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 
 @Singleton
-class TopicController @Inject()(inviteRepository: InviteRepository, topicRepository: TopicRepository, auth: AuthenticationActionBuilder, cc: ControllerComponents, implicit val databaseExecutionContext: DatabaseExecutionContext) extends AbstractController(cc) {
+class TopicController @Inject()(ratingRepository: RatingRepository, inviteRepository: InviteRepository, topicRepository: TopicRepository, auth: AuthenticationActionBuilder, cc: ControllerComponents, implicit val databaseExecutionContext: DatabaseExecutionContext) extends AbstractController(cc) {
   private val logger: Logger = Logger(this.getClass)
 
   def topics: Action[AnyContent] = auth.async { implicit request =>
@@ -23,10 +22,18 @@ class TopicController @Inject()(inviteRepository: InviteRepository, topicReposit
     }
   }
 
+  def ratings(id : Int): Action[AnyContent] = auth.async { implicit request =>
+    ratingRepository.ratings(id).map{ratings =>
+      Ok(Rating.toJson(ratings))
+    }
+  }
+
   def topic(id : Int) : Action[AnyContent] = auth.async{implicit request =>
     // TODO implement
     return null
   }
+
+
 
   def create: Action[JsValue] = auth(parse.json).async { implicit request =>
     val author = request.session("email")
@@ -82,6 +89,20 @@ class TopicController @Inject()(inviteRepository: InviteRepository, topicReposit
           } else {
            Created(s"created ${inviteArray.size} invites")
           }
+        }
+
+      case _ => Future.successful(BadRequest("wrong format"))
+    }
+  }
+
+  def createRating(topicId : Int) : Action[JsValue] = auth(parse.json).async { request =>
+    request.body match {
+      case JsObject(map) =>
+        val createdBy = request.session("email")
+        val point = map("point").as[String]
+        val comment = map("comment").as[String]
+        ratingRepository.create(topicId, createdBy, point.toDouble, comment).map { notSuccess =>
+          if (notSuccess) InternalServerError else Ok
         }
 
       case _ => Future.successful(BadRequest("wrong format"))
