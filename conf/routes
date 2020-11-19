@@ -8,9 +8,12 @@ GET  /logout                    controllers.AuthenticationController.logout
 GET /topics                      controllers.TopicController.topics
 GET /topics/:id/ratings      controllers.TopicController.ratings(id : Int)
 POST /topics/:id/ratings      controllers.TopicController.createRating(id : Int)
+PUT /topics/:id/ratings      controllers.TopicController.updateRating(id : Int)
+
 
 POST /topics                     controllers.TopicController.create
 PUT /topics                     controllers.TopicController.update
+DELETE /topics/:id            controllers.TopicController.delete(id: Int)
 
 # GET /topics/:id                controllers.TopicController.topics
 POST /topics/:id/invites       controllers.TopicController.createInvite(id : Int)

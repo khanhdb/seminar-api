@@ -11,9 +11,13 @@ import play.api.libs.json.{JsValue, Json}
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-object Status extends Enumeration {
+object TopicStatus extends Enumeration {
   val NEW = Value("N")
+  val PASSED = Value("P")
+  val REJECTED = Value("R")
+  val DELETED = Value("X")
   val ACTIVE = Value("A")
+  val FINISHED = Value("F")
 }
 
 object Topic {
@@ -55,6 +59,10 @@ class TopicRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCont
 
   def update(title : String, author : String, link : String, description : String, time : Date, id : Int): Future[Boolean] = Future(db.withConnection {implicit connection =>
     SQL"UPDATE Topic SET title=$title, link=$link, description=$description, time=$time WHERE author = $author AND id = $id".execute()
+  })
+
+  def changeStatus(id :Int, author :String, status: String): Future[Boolean] = Future(db.withConnection { implicit connection =>
+     SQL"UPDATE Topic SET status=$status WHERE id=$id AND author=$author".execute()
   })
 
 

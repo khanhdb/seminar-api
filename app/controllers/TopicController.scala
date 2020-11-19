@@ -3,7 +3,7 @@ package controllers
 import java.util.{Date, NoSuchElementException}
 
 import javax.inject._
-import models.{DatabaseExecutionContext, InviteRepository, Rating, RatingRepository, Topic, TopicRepository}
+import models._
 import play.api.Logger
 import play.api.libs.json.{JsArray, JsObject, JsValue}
 import play.api.mvc._
@@ -73,6 +73,13 @@ class TopicController @Inject()(ratingRepository: RatingRepository, inviteReposi
     }
   }
 
+  def delete(id : Int) : Action[AnyContent] = auth.async{ request =>
+    val author = request.session("email")
+    topicRepository.changeStatus(id, author, TopicStatus.DELETED.toString).map{ notUpdated =>
+      if (notUpdated) InternalServerError else Ok
+    }
+  }
+
   def createInvite(topicId: Int): Action[JsValue] = auth(parse.json).async { request =>
     request.body match {
       case JsArray(inviteArray) =>
@@ -99,10 +106,26 @@ class TopicController @Inject()(ratingRepository: RatingRepository, inviteReposi
     request.body match {
       case JsObject(map) =>
         val createdBy = request.session("email")
-        val point = map("point").as[String]
+        val point = map("point").as[Double]
         val comment = map("comment").as[String]
-        ratingRepository.create(topicId, createdBy, point.toDouble, comment).map { notSuccess =>
-          if (notSuccess) InternalServerError else Ok
+        //todo 1 user has only 1 comment per topic
+        ratingRepository.create(topicId, createdBy, point, comment).map { notSuccess =>
+          if (notSuccess) InternalServerError else Created
+        }
+
+      case _ => Future.successful(BadRequest("wrong format"))
+    }
+  }
+
+  def updateRating(topicId: Int) : Action[JsValue] = auth(parse.json).async{ request =>
+    request.body match {
+      case JsObject(map) =>
+        val createdBy = request.session("email")
+        val id = map("id").as[Int]
+        val point = map("point").as[Double]
+        val comment = map("comment").as[String]
+        ratingRepository.update(id, topicId, point, comment, createdBy).map { notSuccess =>
+          if (notSuccess) BadRequest("query failed") else Ok
         }
 
       case _ => Future.successful(BadRequest("wrong format"))
