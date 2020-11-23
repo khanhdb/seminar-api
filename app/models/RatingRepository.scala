@@ -38,9 +38,8 @@ class RatingRepository @Inject()(api: DBApi)(implicit ec: DatabaseExecutionConte
   })
 
   def update(id: Int, topicId : Int, point : Double, comment: String, createdBy: String): Future[Boolean] = Future(db.withConnection { implicit connection =>
-//    SQL"UPDATE Rating SET point=$point, comment='$comment', updated_at=CURRENT_TIMESTAMP() WHERE topic_id=$topicId AND id=$id AND created_by='$createdBy'".execute()
-        SQL"UPDATE Rating SET point=$point, comment='$comment' WHERE topic_id=$topicId AND id=$id".execute()
+    SQL"UPDATE Rating SET point=$point, comment=$comment, updated_at=CURRENT_TIMESTAMP() WHERE topic_id=$topicId AND id=$id AND created_by=$createdBy".execute()
   })
 
-  def ratings(topicId : Int): Future[Seq[Rating]] = super.query(s"SELECT * FROM Rating WHERE topic_id='$topicId'")
+  def ratings(topicId : Int): Future[Seq[Rating]] = super.query(SQL"SELECT * FROM Rating WHERE topic_id=$topicId")
 }
