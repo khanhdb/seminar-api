@@ -12,7 +12,7 @@ import scala.concurrent.Future
 
 object InviteStatus extends Enumeration {
   val PENDING = Value("P")
-  val ACCEPT = Value("A")
+  val ACCEPTED = Value("A")
   val INTERESTED = Value("I")
   val REJECT = Value("X")
 }
@@ -28,7 +28,7 @@ case class Invite(id : Int, topicId : Int, status : String, inviteTo : String, c
 class InviteRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) extends AbstractRepository [Invite](dbapi){
 
   def create(topicId : Int, inviteTo : String): Future[Boolean] = Future(db.withConnection { implicit connection =>
-    SQL"INSERT INTO Invite  (topic_id, status, invite_to, created_at) values ($topicId, 'N', $inviteTo, CURRENT_TIMESTAMP())".execute()
+    SQL"INSERT INTO Invite  (topic_id, status, invite_to, created_at) values ($topicId, 'A', $inviteTo, CURRENT_TIMESTAMP())".execute()
   })
 
   def updateStatus(id : Int, topicId : Int, inviteTo: String, newStatus: String) = Future(db.withConnection { implicit connection =>
