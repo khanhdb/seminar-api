@@ -74,13 +74,7 @@ class TopicController @Inject()(ratingRepository: RatingRepository, inviteReposi
         case _ => Future.successful(true)
       }
 
-      Future.sequence(createFuture).map { results =>
-        if (results.exists(notCreated => notCreated)) {
-          NotAcceptable
-        } else {
-          Created(s"created ${inviteSeq.size} invites")
-        }
-      }
+      Future.sequence(createFuture).map {_ => Created(s"created ${inviteSeq.size} invites") }
     }
   }
 
