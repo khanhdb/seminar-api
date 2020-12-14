@@ -1,13 +1,15 @@
 package controllers
 
+import contant.AppConstant
 import models.{DatabaseExecutionContext, User, UserRepository}
 import play.api.libs.json.JsValue
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import services.AuthenticationActionBuilder
+import services.{AuthenticationActionBuilder, FirebaseAdmin}
 
 import javax.inject.Inject
+import scala.collection.JavaConverters.seqAsJavaListConverter
 
-class UserController  @Inject()(repository : UserRepository, auth : AuthenticationActionBuilder, cc: ControllerComponents, implicit val databaseExecutionContext: DatabaseExecutionContext) extends AbstractController(cc) with JsonBodyHandler {
+class UserController  @Inject()(repository : UserRepository, auth : AuthenticationActionBuilder, cc: ControllerComponents, firebaseAdmin: FirebaseAdmin, implicit val databaseExecutionContext: DatabaseExecutionContext) extends AbstractController(cc) with JsonBodyHandler {
   def users : Action[AnyContent] = auth.async{ implicit request =>
     val email = request.session("email")
     repository.allUsers.map{users =>
@@ -23,6 +25,8 @@ class UserController  @Inject()(repository : UserRepository, auth : Authenticati
         if(notCreated){
           Ok("not added")
         } else {
+          // subscribe topic 'notification_all'
+          firebaseAdmin.messagingService.subscribeToTopic(List(fcmToken).asJava, AppConstant.NOTIFICATION_TOPIC)
           Ok("token added")
         }
       }

@@ -2,6 +2,7 @@ GET  /                           controllers.HomeController.index
 
 GET /users                     controllers.UserController.users
 POST /users/register-notification controllers.UserController.registerNotification
+# DELETE /users/register-notification controllers.UserController.
 
 POST /login                      controllers.AuthenticationController.login
 GET  /logout                    controllers.AuthenticationController.logout

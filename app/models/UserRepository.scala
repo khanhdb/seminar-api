@@ -2,13 +2,10 @@ package models
 
 import anorm.SqlParser.{get, str}
 import anorm._
-import contant.AppConstant
 import play.api.db.DBApi
 import play.api.libs.json.{JsValue, Json, OFormat}
-import services.{FirebaseAdmin, FirebasePushNotification}
 
 import javax.inject.Inject
-import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.concurrent.Future
 
 case class User(email: String, name: String, displayName: Option[String] = None)
@@ -21,7 +18,7 @@ object User {
 }
 
 @javax.inject.Singleton
-class UserRepository @Inject()(dbapi: DBApi, fcmTokenRepository: FCMtokenRepository, admin: FirebaseAdmin)(implicit ec: DatabaseExecutionContext) extends AbstractRepository[User](dbapi) {
+class UserRepository @Inject()(dbapi: DBApi, fcmTokenRepository: FCMtokenRepository)(implicit ec: DatabaseExecutionContext) extends AbstractRepository[User](dbapi) {
 
 
   def create(email: String, name: String): Future[Boolean] = Future(db.withConnection { implicit connection =>
@@ -29,8 +26,6 @@ class UserRepository @Inject()(dbapi: DBApi, fcmTokenRepository: FCMtokenReposit
   })
 
   def addNotificationToken(email: String, token: String): Future[Boolean] = {
-    // subscribe topic 'notification_all'
-    admin.messagingService.subscribeToTopic(List(token).asJava, AppConstant.NOTIFICATION_TOPIC)
     fcmTokenRepository.create(email, token)
   }
 
