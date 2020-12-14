@@ -2,12 +2,11 @@ package models
 
 import anorm.SqlParser.{get, str}
 import anorm._
-import javax.inject.Inject
 import play.api.db.DBApi
 import play.api.libs.json.{JsValue, Json}
 
+import javax.inject.Inject
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 case class User(email: String, name: String, displayName : Option[String] = None)
 
@@ -19,42 +18,21 @@ object User{
 }
 
 @javax.inject.Singleton
-class  UserRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) {
-
-  private val db = dbapi.database("default")
-
-  /**
-   * Parse a User from a ResultSet
-   */
-  private[models] val simple = {
+class  UserRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) extends AbstractRepository[User](dbapi) {
+  override protected def rowParser: RowParser[User] = {
     get[String]("User.email") ~
     str("User.name") map {
       case email ~ name => User(email, name)
     }
   }
 
-
   def create(email : String, name : String): Future[Boolean] = Future(db.withConnection { implicit connection =>
     SQL"INSERT INTO User(email, name) values($email, $name)".execute()
   })
 
+  def addNotificationToken(email: String, token : String) : Future[Boolean] = Future(db.withConnection { implicit connection =>
+    SQL"INSERT INTO User_fcm_token(email, token) values($email, $token)".execute()
+  })
 
-  def allUsers: Future[Seq[User]] = Future(db.withConnection { implicit connection =>
-    SQL"select * from User".
-      fold(Seq.empty[User], ColumnAliaser.empty) { (acc, row) => // Anorm streaming
-        row.as(simple) match {
-          case Failure(parseErr) => {
-            println(s"Fails to parse $row: $parseErr")
-            acc
-          }
-
-          case Success(user) =>
-            user +: acc
-        }
-      }
-  }).flatMap {
-    case Left(err :: _) => Future.failed(err)
-    case Left(_) => Future(Seq.empty)
-    case Right(acc) => Future.successful(acc.reverse)
-  }
+  def allUsers: Future[Seq[User]] = super.query(SQL"SELECT * FROM User")
 }
