@@ -6,12 +6,12 @@ import javax.inject.Inject
 import play.api.{Configuration, Logger}
 
 @Inject
-class FireBaseAuthentication @Inject()(config : Configuration, fire: FirebasePushNotification){
+class FireBaseAuthentication @Inject()(config : Configuration, admin: FirebaseAdmin){
   private val logger = Logger(this.getClass)
   def verify(idTokenString : String) : Option[UserPayload]= {
     val ACCEPTED_EMAIL_DOMAIN = config.underlying.getString(AppConstant.ACCEPTED_EMAIL_DOMAIN)
     try {
-      val decodedToken = FirebaseAuth.getInstance(fire.firebaseApp).verifyIdToken(idTokenString)
+      val decodedToken = admin.authService.verifyIdToken(idTokenString)
       val email = decodedToken.getEmail
       Option(email) match {
         case None =>

@@ -1,12 +1,9 @@
 package services
 
+import com.google.firebase.messaging.Message
+import play.api.Logger
 
-import com.google.firebase.FirebaseApp
-import com.google.firebase.messaging.{FirebaseMessaging, Message}
-import contant.AppConstant
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Logger}
-
 import scala.collection.JavaConverters.mapAsJavaMapConverter
 
 trait PushNotificationService {
@@ -15,12 +12,8 @@ trait PushNotificationService {
 }
 
 @Singleton
-class FirebasePushNotification @Inject() (config : Configuration) extends PushNotificationService {
+class FirebasePushNotification @Inject()(admin : FirebaseAdmin) extends PushNotificationService {
   private val logger: Logger = Logger(this.getClass)
-  private val appName = config.underlying.getString(AppConstant.FIREBASE_APP_NAME)
-  val firebaseApp = FirebaseApp.initializeApp(appName)
-
-  private lazy val instance: FirebaseMessaging = FirebaseMessaging.getInstance(FirebaseApp.getInstance(appName))
 
   override def notify(data: Map[String, String]): Unit = {
     val topic = "notification"
@@ -29,7 +22,7 @@ class FirebasePushNotification @Inject() (config : Configuration) extends PushNo
 
   override def send(data: Map[String, String], topic: String): Unit = {
     val message = Message.builder.putAllData(data.asJava).setTopic(topic).build
-    val response = this.instance.send(message)
+    val response = admin.messagingService.send(message)
     logger.debug(s"message sent successfully $response")
   }
 }
