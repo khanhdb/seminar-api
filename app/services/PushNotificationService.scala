@@ -1,6 +1,7 @@
 package services
 
 import com.google.firebase.messaging.Message
+import contant.AppConstant
 import play.api.Logger
 
 import javax.inject.{Inject, Singleton}
@@ -16,8 +17,7 @@ class FirebasePushNotification @Inject()(admin : FirebaseAdmin) extends PushNoti
   private val logger: Logger = Logger(this.getClass)
 
   override def notify(data: Map[String, String]): Unit = {
-    val topic = "notification"
-    send(data, topic)
+    send(data, AppConstant.NOTIFICATION_TOPIC)
   }
 
   override def send(data: Map[String, String], topic: String): Unit = {
